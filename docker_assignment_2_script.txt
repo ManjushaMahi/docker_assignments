@@ -1,0 +1,105 @@
+pipeline{
+
+    agent{
+
+        label "slave-2"
+
+    }
+
+    stages{
+
+        stage("clear all container"){
+
+            steps{
+
+                sh "sudo yum install docker -y"
+
+                sh "sudo service docker start"
+
+                sh "sudo docker kill test || true"
+
+                sh "sudo docker rm test || true"
+
+                sh "sudo docker kill test1 || true"
+
+                sh "sudo docker rm test1 || true"
+
+                sh "sudo docker kill test2 || true"
+
+                sh "sudo docker rm test2 || true"
+
+            }
+
+        }
+
+        stage("Docker image built"){
+
+            steps{
+
+                sh "sudo docker pull httpd"
+
+                sh "sudo docker run -dp 80:80 --name test httpd"
+
+                sh "sudo docker run -dp 90:80 --name test1 httpd"
+
+                sh "sudo docker run -dp 8080:80 --name test2 httpd"
+
+            }
+
+        }
+
+        stage("git copy Q1"){
+
+            steps{
+
+                sh "sudo docker exec test apt update"
+
+                sh "sudo docker exec test apt install -y git"
+
+                sh "sudo docker exec test git clone -b Q1 https://github.com/Rohanta22/project_2025_main.git"
+
+                sh "sudo docker exec test cp /usr/local/apache2/project_2025_main/index.html /usr/local/apache2/htdocs/"
+
+            }
+
+        }
+
+        stage("git copy Q2"){
+
+            steps{
+
+                sh "sudo docker exec test1 apt update"
+
+                sh "sudo docker exec test1 apt install -y git"
+
+                sh "sudo docker exec test1 git clone -b Q2 https://github.com/Rohanta22/project_2025_main.git"
+
+                sh "sudo docker exec test1 cp /usr/local/apache2/project_2025_main/index.html /usr/local/apache2/htdocs/"
+
+            }
+
+            
+        
+         }
+
+        stage("git copy Q3"){
+
+            steps{
+
+                sh "sudo docker exec test2 apt update"
+
+                sh "sudo docker exec test2 apt install -y git"
+
+                sh "sudo docker exec test2 git clone -b Q3 https://github.com/Rohanta22/project_2025_main.git"
+
+                sh "sudo docker exec test2 cp /usr/local/apache2/project_2025_main/index.html /usr/local/apache2/htdocs/"
+
+            }
+
+            
+        
+         }
+
+    }
+
+}

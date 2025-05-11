@@ -1,0 +1,125 @@
+pipeline{
+
+    agent {
+
+        label "built-in"
+
+    }
+
+    stages{
+
+        stage("Docker Install"){
+
+            steps{
+
+                sh "sudo yum install docker -y"
+
+                sh "sudo service docker start"
+
+                sh "sudo docker kill s1 || true"
+
+                sh "sudo docker rm s1 || true"
+
+                sh "sudo docker kill s2 || true"
+
+                sh "sudo docker rm s2 || true"
+
+                sh "sudo docker kill s3 || true"
+
+                sh "sudo docker rm s3 || true"
+
+            }
+
+        }
+
+        stage("Q1 git"){
+
+            steps{
+
+                sh "sudo docker volume create for_git_Q1"
+
+                sh "sudo rm -rf *"
+
+                sh "sudo git clone -b Q1 https://github.com/Rohanta22/project_2025_main.git"
+
+                sh "sudo cp -r project_2025_main/* /var/lib/docker/volumes/for_git_Q1/_data/"
+
+            }
+
+        }
+
+        stage("Q1 deploy"){
+
+            steps{
+
+                sh "sudo docker run -dp 80:80 -v for_git_Q1:/usr/local/apache2/htdocs --name s1 httpd"
+
+                sh "sudo docker exec s1 chmod 777 /usr/local/apache2/htdocs/index.html"
+
+            }
+
+        }
+
+        stage("Q2 git"){
+
+            steps{
+
+                sh "sudo docker volume create for_git_Q2"
+
+                sh "sudo rm -rf *"
+
+                sh "sudo git clone -b Q2 https://github.com/Rohanta22/project_2025_main.git"
+
+                sh "sudo cp -r project_2025_main/* /var/lib/docker/volumes/for_git_Q2/_data/"
+
+            }
+
+        }
+
+        stage("Q2 deploy"){
+
+            steps{
+
+                sh "sudo docker volume create for_git_Q2"
+
+                sh "sudo docker run -dp 90:80 -v for_git_Q2:/usr/local/apache2/htdocs --name s2 httpd"
+
+                sh "sudo docker exec s2 chmod 777 /usr/local/apache2/htdocs/index.html"
+
+            }
+
+        }
+
+        stage("Q3 git"){
+
+            steps{
+
+                sh "sudo docker volume create for_git_Q3"
+
+                sh "sudo rm -rf *"
+
+                sh "sudo git clone -b Q3 https://github.com/Rohanta22/project_2025_main.git"
+
+                sh "sudo cp -r project_2025_main/* /var/lib/docker/volumes/for_git_Q3/_data/"
+
+            }
+
+        }
+
+        stage("Q3 deploy"){
+
+            steps{
+
+                sh "sudo docker volume create for_git_Q3"
+
+                sh "sudo docker run -dp 8000:80 -v for_git_Q3:/usr/local/apache2/htdocs --name s3 httpd"
+
+                sh "sudo docker exec s3 chmod 777 /usr/local/apache2/htdocs/index.html"
+
+            }
+
+        }
+
+    }
+
+}
